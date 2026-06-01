@@ -101,3 +101,8 @@ C:\Users\vigna\AppData\Roaming\gcloud\application_default_credentials.json
 * Access the dataset directly from the cloud bucket
 * Implementation details can be found in the **Data Ingestion module**
 
+
+## Data Preprocessing
+* import all modules required into the data_preprocesijnga nd also add data_preprocessing in congif_yaml file
+instakk imbalanced learn from requiremtns,txt
+
