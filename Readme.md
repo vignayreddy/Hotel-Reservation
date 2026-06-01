@@ -117,3 +117,6 @@ complete all steps as followed ..
  MlFLOW Used for experiment tracking 
 * mlflow ui
 <!-- http://127.0.0.1:5000 -->
+
+
+* Training pipeline and Data & code versioning
