@@ -105,4 +105,15 @@ C:\Users\vigna\AppData\Roaming\gcloud\application_default_credentials.json
 ## Data Preprocessing
 * import all modules required into the data_preprocesijnga nd also add data_preprocessing in congif_yaml file
 instakk imbalanced learn from requiremtns,txt
+complete all steps as followed ..
 
+##Model Training 
+
+
+*  create model_parans in config folder for storing model parameters...
+
+
+
+ MlFLOW Used for experiment tracking 
+* mlflow ui
+<!-- http://127.0.0.1:5000 -->
