@@ -120,3 +120,7 @@ complete all steps as followed ..
 
 
 * Training pipeline and Data & code versioning
+
+
+* User App building using Flask and chatgpt
+
