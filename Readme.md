@@ -188,3 +188,10 @@ docker/getting-started   latest    d79336f4812b   3 years ago      73.9MB
 MB
 (venv) PS C:\Users\vigna\Desktop\HotelReservation\custom_jenkins> docker run -d --name jenkins-dind -p 8080:8080 -p 50000:50000 jenkins-dind:latest
 6c0b3bef3c9222e7014b362dacd833abb720a7c7c3ba2da80a2e9d6dab50879f
+
+
+# go to gcr and turn it enabled
+
+
+54:53 -- Artifact Registry API
+Cloud Resource Manager API
