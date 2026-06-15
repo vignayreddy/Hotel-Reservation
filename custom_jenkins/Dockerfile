@@ -21,7 +21,11 @@ RUN curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cl
     tar -xf google-cloud-cli-linux-x86_64.tar.gz && \
     mv google-cloud-sdk /opt/gcloud && \
     /opt/gcloud/install.sh --quiet && \
-    rm google-cloud-cli-linux-x86_64.tar.gz
+    rm google-cloud-cli-linux-x86_64.tar.gz && \
+    chown -R jenkins:jenkins /opt/gcloud
+
+# Add jenkins user to docker and root groups
+RUN usermod -aG docker,root jenkins
 
 # Add gcloud to PATH
 ENV PATH=$PATH:/opt/gcloud/bin
