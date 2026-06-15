@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    options {
+        wipeOutWorkspace()
+    }
 
     environment {
         VENV_DIR = 'venv'
