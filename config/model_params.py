@@ -12,8 +12,8 @@ LIGHTGM_PARAMS = {
 
 RANDOM_SEARCH_PARAMS = {
     "n_iter":4,
-    "cv":1,
-    "n_jobs":2, # limit CPU usage
+    "cv":2,
+    "n_jobs":-1, # use all cors of cpu for training
     "verbose":2,
     "random_state":42,
     "scoring":"accuracy"
