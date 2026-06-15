@@ -1,8 +1,6 @@
 pipeline {
     agent any
-    options {
-        wipeOutWorkspace()
-    }
+
 
     environment {
         VENV_DIR = 'venv'
@@ -11,6 +9,11 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
 
         stage('Clone Repo') {
             steps {
