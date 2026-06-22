@@ -7,7 +7,7 @@ This repository contains an end-to-end MLOps pipeline designed to predict whethe
 ## 🏗️ System Architecture & Workflow
 
 1. **Data Layer:** Raw reservation data is managed via automated ETL flows and stored securely in a Google Cloud Storage bucket.
-2. **Experimentation:** Version control handles small tracking files while heavy assets are tracked via DVC. Models are monitored across iterations using an MLflow tracking server.
+2. **Experimentation:** Version control handles small tracking files while heavy assets are tracked via Git. Models are monitored across iterations using an MLflow tracking server.
 3. **Continuous Integration & Deployment:** Commits to GitHub trigger automated Jenkins pipelines. Jenkins builds a Docker image via Docker-in-Docker (DinD), registers it to Google Container Registry (GCR), and ships it to Google Cloud Run.
 
 ---
@@ -141,5 +141,5 @@ docker run -d --name jenkins-dind -p 8080:8080 -p 50000:50000 jenkins-dind:lates
 | Docker | Containerization & local Jenkins |
 | Google Cloud SDK | GCP authentication & deployment |
 | MLflow | Experiment tracking |
-| DVC | Large file / data versioning |
+| Git | Large file / data versioning |
 | Jenkins | CI/CD automation |
