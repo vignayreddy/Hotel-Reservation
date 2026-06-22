@@ -1,197 +1,145 @@
-# 🏨 Hotel Reservation Project
+# 🏨 Hotel Reservation Cancellation Prediction (MLOps)
 
-## 📦 Database Setup
-
-* Create a **Google Cloud Storage bucket** in your project.
-* Upload the **hotel reservation dataset** into the bucket.
+This repository contains an end-to-end MLOps pipeline designed to predict whether a customer will honor or cancel their hotel reservation. The system leverages cloud data storage, robust model tracking, automated CI/CD pipelines, and serverless container deployment.
 
 ---
 
-## ⚙️ Project Setup
+## 🏗️ System Architecture & Workflow
 
-### 1. Create Virtual Environment
+1. **Data Layer:** Raw reservation data is managed via automated ETL flows and stored securely in a Google Cloud Storage bucket.
+2. **Experimentation:** Version control handles small tracking files while heavy assets are tracked via DVC. Models are monitored across iterations using an MLflow tracking server.
+3. **Continuous Integration & Deployment:** Commits to GitHub trigger automated Jenkins pipelines. Jenkins builds a Docker image via Docker-in-Docker (DinD), registers it to Google Container Registry (GCR), and ships it to Google Cloud Run.
+
+---
+
+## 📁 Repository Directory Structure
+
+```text
+├── src/                      # Source code modules (Ingestion, Preprocessing, Training)
+├── notebook/                 # Jupyter Notebooks for EDA and prototype testing
+├── templates/                # HTML files for the Flask UI
+├── static/                   # CSS and JavaScript assets
+├── config/                   # Configuration files (config.yaml, model_params.yaml)
+├── artifacts/                # Local data splits and serialized model outputs
+├── pipeline/                 # Training and prediction orchestration scripts
+├── utils/                    # Common helper utilities
+├── Dockerfile                # Project container definition
+├── requirements.txt          # Python dependencies
+└── setup.py                  # Project package installation settings
+```
+
+---
+
+## ⚙️ Local Development Setup
+
+### 1. Environment Initialization
+
+Isolate your development dependencies by initializing a clean virtual environment:
 
 ```bash
 python -m venv venv
 ```
 
-### 2. Activate Virtual Environment
+Activate the environment:
+
+| OS | Command |
+|----|---------|
+| Windows (PowerShell) | `venv\Scripts\activate` |
+| Linux / macOS | `source venv/bin/activate` |
+
+### 2. Dependency Installation
+
+Install required libraries (including `imbalanced-learn`) and package the source directory in editable mode:
 
 ```bash
-venv\Scripts\activate
-```
-
-### 3. Install Dependencies
-
-```bash
+pip install -r requirements.txt
 pip install -e .
 ```
 
-> This command automatically checks and installs dependencies defined in `setup.py`.
-
 ---
 
-## ☁️ Google Cloud Configuration
+## ☁️ Google Cloud Platform Configuration
 
-### 1. Verify Google Cloud SDK
+### 1. Service Account Authorization
 
-```bash
-gcloud --version
-```
+To extract files from Cloud Storage, establish valid authentication configurations:
 
----
+1. Go to the GCP Console and navigate to **IAM & Admin → Service Accounts**.
+2. Create a service account with the **Storage Admin** and **Storage Object Viewer** roles.
+3. Whitelist the service account email within your target Cloud Storage bucket permissions panel.
 
-## 🔐 Service Account Setup
+### 2. Local Key Generation Fallback
 
-1. Go to **IAM & Admin → Service Accounts**
-2. Create or select a service account
-3. Assign the following roles:
-
-   * **Storage Admin**
-   * **Storage Object Viewer**
-
----
-
-## 🪣 Bucket Permissions
-
-1. Navigate to **Cloud Storage → Buckets**
-2. Select your bucket (e.g., `hotel-reservation`)
-3. Go to **Permissions (Principals)**
-4. Add the service account:
-
-   ```
-   hotel-reservation@project-82ee730d-c76d-4cc9-b7b.iam.gserviceaccount.com
-   ```
-5. Assign the same roles:
-
-   * Storage Admin
-   * Storage Object Viewer
-
----
-
-## 🔑 Authentication Setup
-
-1. Go to **Service Accounts**
-2. Select your service account
-3. Generate a **Key (JSON format)**
-
----
-
-## ⚠️ Fix for Key Generation Error
-
-If key generation fails, run:
+If you encounter permission blockers or errors while downloading JSON keys from the console, authenticate locally via the Google Cloud CLI:
 
 ```bash
 gcloud auth application-default login
 ```
 
-This creates credentials at:
+This maps credentials locally to:
 
 ```
 C:\Users\vigna\AppData\Roaming\gcloud\application_default_credentials.json
 ```
 
-> ✅ This file is sufficient to establish a secure connection between your local environment and Google Cloud for data access.
+---
+
+## 📊 Pipeline Orchestration
+
+### Data Ingestion & Preprocessing
+
+- Run the ingestion module to extract the dataset from your GCP bucket and execute a structured train-test split.
+- Add `data_preprocessing` parameters to `config/config.yaml`.
+- Use preprocessing routines to balance target distribution flags using `imbalanced-learn`.
+
+### Experiment Tracking with MLflow
+
+Configure model training hyperparameters inside `config/model_params.yaml`. To launch your experiment tracker and compare iterations, spin up the MLflow server:
+
+```bash
+mlflow ui
+```
+
+Dashboard URL: `http://127.0.0.1:5000`
 
 ---
 
-## 📥 Data Ingestion
+## 🚀 CI/CD Automation via Jenkins & Cloud Run
 
-* Use the configured service account and credentials
-* Access the dataset directly from the cloud bucket
-* Implementation details can be found in the **Data Ingestion module**
+The deployment pipeline relies on a custom **Docker-in-Docker (DinD)** Jenkins image to assemble runtime environments.
 
+### 1. Build the Custom Jenkins Automation Image
 
-## Data Preprocessing
-* import all modules required into the data_preprocesijnga nd also add data_preprocessing in congif_yaml file
-instakk imbalanced learn from requiremtns,txt
-complete all steps as followed ..
-
-##Model Training 
-
-
-*  create model_parans in config folder for storing model parameters...
-
-
-
- MlFLOW Used for experiment tracking 
-* mlflow ui
-<!-- http://127.0.0.1:5000 -->
-
-
-* Training pipeline and Data & code versioning
-
-
-* User App building using Flask and chatgpt
-
-* CI-CD Deployment using jenkins and Google Clo
-ud Run
-
-
-project->github->google cloud 
-
-1) setup jenkins container
-2) Github Integration
-3) Dockerization of project
-4) Create a venv in your jenkins
-5) Build Docker Image of yout project - > push to GCR (Google Cloud Registry)
-6) Extract the image from GCR -> Push to Google Cloud Run
-
-
-
-
-DinD -> Docker in Docker
-
-
-(venv) PS C:\Users\vigna\Desktop\HotelReservation\custom_jenkins> docker login
-Authenticating with existing credentials... [Username: vignayreddy]
-
-i Info → To login with a different account, run 'docker logout' followed by 'docker login'
-
-
-Login Succeeded
-(venv) PS C:\Users\vigna\Desktop\HotelReservation\custom_jenkins> 
-
+```bash
+cd custom_jenkins
 docker build -t jenkins-dind .
-(venv) PS C:\Users\vigna\Desktop\HotelReservation\custom_jenkins> docker build -t jenkins-dind .
-[+] Building 65.5s (7/7) FINISHED                                   docker:desktop-linux
- => [internal] load build definition from Dockerfile                                0.0s
- => => transferring dockerfile: 211B                                                0.0s
- => [internal] load metadata for docker.io/jenkins/jenkins:lts                      1.0s
- => [internal] load .dockerignore                                                   0.0s
- => => transferring context: 2B                                                     0.0s
- => CACHED [1/3] FROM docker.io/jenkins/jenkins:lts@sha256:01c992ffef29dcf41c7164e  0.0s
- => => resolve docker.io/jenkins/jenkins:lts@sha256:01c992ffef29dcf41c7164e8c16285  0.0s
- => [2/3] RUN apt-get update &&     apt-get install -y docker.io &&     apt-get c  43.7s
- => [3/3] RUN usermod -aG docker jenkins                                            0.3s 
- => exporting to image                                                             20.3s 
- => => exporting layers                                                            17.0s 
- => => exporting manifest sha256:90f55f5527dca38d97bf4cf0e7162048d592943aee8229c00  0.0s 
- => => exporting config sha256:8981d23b65db7b343459ed2bca09a71c701f2a6b6de34d76c71  0.0s 
- => => exporting attestation manifest sha256:b3e28e5b1111b4eb9b613f505e5c66bcd2568  0.0s 
- => => exporting manifest list sha256:5ef383fdbef540a0e5496b3e026870073a737cc80f7c  0.0s
- => => naming to docker.io/library/jenkins-dind:latest                              0.0s
- => => unpacking to docker.io/library/jenkins-dind:latest                           3.2s
+```
 
-View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/wqcwotvt78aofy0fp6g7ha6ti
-(venv) PS C:\Users\vigna\Desktop\HotelReservation\custom_jenkins> 
-(venv) PS C:\Users\vigna\Desktop\HotelReservation\custom_jenkins> 
-(venv) PS C:\Users\vigna\Desktop\HotelReservation\custom_jenkins> docker images
-REPOSITORY               TAG       IMAGE ID       CREATED          SIZE
-jenkins-dind             latest    5ef383fdbef5   46 seconds ago   1.41GB
-vignay/welcome-app       latest    fe4c68f3b86c   6 months ago     92.9MB
-redis                    latest    43355efd2249   6 months ago     202MB
-hello-world              latest    f7931603f70e   9 months ago     20.3kB
-docker/getting-started   latest    d79336f4812b   3 years ago      73.9MB
-(venv) PS C:\Users\vigna\Desktop\HotelReservation\custom_jenkins> 
+### 2. Deploy the Jenkins Container
 
-MB
-(venv) PS C:\Users\vigna\Desktop\HotelReservation\custom_jenkins> docker run -d --name jenkins-dind -p 8080:8080 -p 50000:50000 jenkins-dind:latest
-6c0b3bef3c9222e7014b362dacd833abb720a7c7c3ba2da80a2e9d6dab50879f
+Launch your local automation server with exposed web management ports:
 
+```bash
+docker run -d --name jenkins-dind -p 8080:8080 -p 50000:50000 jenkins-dind:latest
+```
 
-# go to gcr and turn it enabled
+### 3. Deployment Steps
 
+1. Connect Jenkins to your **GitHub** repository webhook.
+2. Configure your pipeline stage to login to Docker, assemble your Flask web app image, and push it directly to the **Google Container Registry (GCR)**.
+3. Extract the freshly built image from GCR and deploy it directly onto **Google Cloud Run** for public serverless hosting.
 
-54:53 -- Artifact Registry API
-Cloud Resource Manager API
+> ⚠️ **Important:** Ensure that the **Artifact Registry API** and **Cloud Resource Manager API** are enabled within your GCP Project console prior to executing the build pipeline.
+
+---
+
+## 📋 Prerequisites Summary
+
+| Tool | Purpose |
+|------|---------|
+| Python 3.8+ | Core runtime |
+| Docker | Containerization & local Jenkins |
+| Google Cloud SDK | GCP authentication & deployment |
+| MLflow | Experiment tracking |
+| DVC | Large file / data versioning |
+| Jenkins | CI/CD automation |
