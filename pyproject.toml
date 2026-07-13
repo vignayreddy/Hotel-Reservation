@@ -1,2 +1,20 @@
+[project]
+name = "flask-app"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+dependencies = [
+    "Flask",
+    "gunicorn",
+    "pandas",
+    "numpy",
+    "google-cloud-storage",
+    "scikit-learn",
+    "pyyaml",
+    "imbalanced-learn",
+    "lightgbm",
+    "mlflow"
+]
+
 [tool.vercel]
 entrypoint = "application:app"
